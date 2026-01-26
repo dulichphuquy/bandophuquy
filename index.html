@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phú Quý Pro Map - Final Version</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- CORE LAYOUT --- */
+        :root {
+            --primary: #007bff;
+            --sightseeing: #f39c12;
+            --hotel: #2980b9;
+            --food: #e74c3c;
+            --shop: #9b59b6;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Roboto', sans-serif; overflow: hidden; }
+        .app-container { display: flex; height: 100vh; width: 100vw; flex-direction: row; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 380px; background-color: #fff; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .sidebar-header { padding: 25px 20px 15px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; flex-shrink: 0; }
+        .sidebar-header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+        .sidebar-header p { margin: 5px 0 0; font-size: 13px; opacity: 0.8; }
+
+        .search-container { padding: 15px; background-color: #f8f9fa; border-bottom: 1px solid #eee; }
+        .search-wrapper { position: relative; }
+        #search-input {
+            width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #ddd;
+            border-radius: 25px; font-size: 14px; outline: none; transition: 0.3s;
+        }
+        #search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+
+        .filter-container {
+            padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; gap: 8px; 
+            overflow-x: auto; white-space: nowrap; scrollbar-width: none;
+        }
+        .filter-btn {
+            border: 1px solid #eee; background: #fff; padding: 7px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.2s;
+        }
+        .filter-btn.active.all { background: #34495e; color: white; }
+        .filter-btn.active.sightseeing { background: var(--sightseeing); color: white; }
+        .filter-btn.active.hotel { background: var(--hotel); color: white; }
+        .filter-btn.active.food { background: var(--food); color: white; }
+        .filter-btn.active.shop { background: var(--shop); color: white; }
+
+        /* --- LIST --- */
+        .location-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+        .location-item { border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s; display: flex; align-items: center; padding: 12px 15px; }
+        .location-item:hover { background-color: #f0f7ff; }
+        .item-thumb { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; margin-right: 15px; background: #eee; }
+        .item-info h3 { margin: 0 0 4px; font-size: 15px; color: #333; }
+        .item-info span { font-size: 12px; color: #777; }
+
+        /* --- GALLERY --- */
+        .gallery-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 5px;
+            height: 180px;
+            background: #000;
+            scrollbar-width: none;
+        }
+        .gallery-container::-webkit-scrollbar { display: none; }
+        
+        .gallery-item {
+            flex: 0 0 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            scroll-snap-align: start;
+            cursor: pointer;
+            background: #222;
+        }
+
+        /* --- LIGHTBOX --- */
+        #lightbox-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        #lightbox-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 3px solid white;
+            border-radius: 4px;
+        }
+        .close-lightbox {
+            position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer;
+        }
+
+        /* --- MAP & MARKERS --- */
+        .map-container { flex: 1; position: relative; }
+        #map { width: 100%; height: 100%; background: #000; }
+
+        .custom-zoom {
+            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
+            display: flex; flex-direction: column; gap: 5px;
+        }
+        .zoom-btn {
+            width: 40px; height: 40px; background: white; border-radius: 8px; border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; font-size: 18px; color: #333;
+            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+
+        .marker-pin {
+            width: 34px; height: 34px; border-radius: 50% 50% 50% 0;
+            position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -17px 0 0 -17px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .marker-pin i { transform: rotate(45deg); color: white; font-size: 14px; }
+        
+        .pulse {
+            background: rgba(255,255,255,0.4); border-radius: 50%; height: 14px; width: 14px;
+            position: absolute; left: 50%; top: 50%; margin: 8px 0 0 -7px; transform: rotateX(55deg); z-index: -1;
+        }
+        .pulse:after {
+            content: ""; border-radius: 50%; height: 40px; width: 40px; position: absolute;
+            margin: -13px 0 0 -13px; animation: pulsate 1.5s ease-out; animation-iteration-count: infinite;
+            opacity: 0; box-shadow: 0 0 1px 2px white; animation-delay: 1.1s;
+        }
+        @keyframes pulsate { 0% { transform: scale(0.1, 0.1); opacity: 0; } 50% { opacity: 1; } 100% { transform: scale(1.2, 1.2); opacity: 0; } }
+
+        .street-label {
+            font-size: 12px; font-weight: bold; color: white; text-transform: uppercase;
+            text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
+            white-space: nowrap; pointer-events: auto;
+        }
+
+        #admin-panel {
+            position: absolute; top: 20px; right: 20px; z-index: 1001; display: none;
+            background: rgba(255,255,255,0.9); padding: 10px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .export-btn {
+            background: #27ae60; color: white; border: none; padding: 10px 15px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; font-size: 13px;
+        }
+
+        .leaflet-popup-content-wrapper { border-radius: 12px; overflow: hidden; padding: 0; }
+        .leaflet-popup-content { margin: 0; width: 280px !important; }
+        .popup-body { padding: 15px; }
+        .popup-title { font-size: 16px; font-weight: bold; color: #2c3e50; margin-bottom: 5px; display: block; }
+        .popup-desc { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 10px; }
+        .btn-dir {
+            width: 100%; padding: 10px; background: var(--primary); color: white; border: none;
+            border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        
+        .admin-popup { text-align: center; }
+        .admin-popup button { margin-top: 10px; background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+        <div class="spinner" style="width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #007bff; border-radius:50%; animation:spin 1s linear infinite;"></div>
+        <p style="margin-top:20px; color:#007bff; font-weight:500;">Đang khởi tạo Phú Quý Pro Engine...</p>
+    </div>
+
+    <div id="lightbox-modal" onclick="this.style.display='none'">
+        <span class="close-lightbox">&times;</span>
+        <img id="lightbox-img" src="">
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>PHÚ QUÝ PRO</h1>
+                <p>Multimedia & Admin Edition</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Tìm kiếm địa điểm...">
+                </div>
+            </div>
+
+            <div class="filter-container">
+                <button class="filter-btn active all" onclick="applyFilter('all')">Tất cả</button>
+                <button class="filter-btn sightseeing" onclick="applyFilter('sightseeing')">Tham quan</button>
+                <button class="filter-btn hotel" onclick="applyFilter('hotel')">Lưu trú</button>
+                <button class="filter-btn food" onclick="applyFilter('food')">Ăn uống</button>
+                <button class="filter-btn shop" onclick="applyFilter('shop')">Mua bán</button>
+            </div>
+
+            <div class="data-counter" id="data-counter">Đang đồng bộ dữ liệu...</div>
+            <ul class="location-list" id="location-list-container"></ul>
+        </aside>
+
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="custom-zoom">
+                <button class="zoom-btn" onclick="map.zoomIn()"><i class="fas fa-plus"></i></button>
+                <button class="zoom-btn" onclick="map.zoomOut()"><i class="fas fa-minus"></i></button>
+            </div>
+            <div id="admin-panel">
+                <button class="export-btn" onclick="exportStreetData()"><i class="fas fa-file-export"></i> XUẤT DỮ LIỆU TÊN ĐƯỜNG</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <script>
+        // --- CHÚ Ý: ĐÃ ĐIỀN SẴN LINK CỦA BẠN VÀO ĐÂY ---
+        const CSV_URLS = {
+            sightseeing: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu8yBBJC_POzRBXlsAeJTXJ_-3AXiN0caMdUJZg3wHUDpvcupvdDqv-vMVom1Kbxv5hh0s9Mu-Gis9/pub?gid=0&single=true&output=csv",
+            hotel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu8yBBJC_POzRBXlsAeJTXJ_-3AXiN0caMdUJZg3wHUDpvcupvdDqv-vMVom1Kbxv5hh0s9Mu-Gis9/pub?gid=1681624699&single=true&output=csv",
+            food: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu8yBBJC_POzRBXlsAeJTXJ_-3AXiN0caMdUJZg3wHUDpvcupvdDqv-vMVom1Kbxv5hh0s9Mu-Gis9/pub?gid=656890219&single=true&output=csv",
+            shop: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu8yBBJC_POzRBXlsAeJTXJ_-3AXiN0caMdUJZg3wHUDpvcupvdDqv-vMVom1Kbxv5hh0s9Mu-Gis9/pub?gid=956406715&single=true&output=csv",
+            streets: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSu8yBBJC_POzRBXlsAeJTXJ_-3AXiN0caMdUJZg3wHUDpvcupvdDqv-vMVom1Kbxv5hh0s9Mu-Gis9/pub?gid=1215818235&single=true&output=csv"
+        };
+
+        const THEME = {
+            sightseeing: { color: '#f39c12', icon: 'fa-camera' },
+            hotel: { color: '#2980b9', icon: 'fa-bed' },
+            food: { color: '#e74c3c', icon: 'fa-utensils' },
+            shop: { color: '#9b59b6', icon: 'fa-shopping-cart' }
+        };
+
+        let map, globalLocations = [], streetLabels = [], currentFilter = 'all', currentSearch = '', routingControl = null;
+        const locationGroup = L.layerGroup(), streetGroup = L.layerGroup();
+        const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
+
+        window.viewFullImage = (src) => {
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            modal.style.display = 'flex';
+        };
+
+        async function init() {
+            initMap();
+            if (isAdmin) document.getElementById('admin-panel').style.display = 'block';
+            try {
+                // Tải song song 5 nguồn dữ liệu
+                await Promise.all([
+                    loadData(CSV_URLS.sightseeing, 'sightseeing'),
+                    loadData(CSV_URLS.hotel, 'hotel'),
+                    loadData(CSV_URLS.food, 'food'),
+                    loadData(CSV_URLS.shop, 'shop'),
+                    loadData(CSV_URLS.streets, 'street_label')
+                ]);
+            } catch (err) { 
+                console.error(err);
+                // Hiển thị thông báo nếu lỗi (đặc biệt là lỗi CORS khi chạy file offline)
+                alert("LỖI TẢI DỮ LIỆU: " + err + "\n\nNếu bạn đang chạy file trực tiếp trên máy tính, có thể trình duyệt đã chặn kết nối. Hãy thử nhấn F12 xem lỗi chi tiết.");
+            } finally {
+                document.getElementById('loading-overlay').style.display = 'none';
+                updateUI();
+            }
+            setupSearch();
+        }
+
+        function initMap() {
+            map = L.map('map', { center: [10.525, 108.945], zoom: 13, zoomControl: false, doubleClickZoom: !isAdmin });
+            L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: 'Google'
+            }).addTo(map);
+
+            locationGroup.addTo(map);
+            streetGroup.addTo(map);
+
+            if (isAdmin) {
+                map.on('dblclick', (e) => createStreetLabel("Đường Mới", e.latlng.lat, e.latlng.lng, 0));
+            }
+
+            map.on('click', (e) => {
+                if (routingControl && routingControl.getPlan().isGeometryValid()) return;
+                const lat = e.latlng.lat.toFixed(6), lng = e.latlng.lng.toFixed(6);
+                L.popup().setLatLng(e.latlng).setContent(`<div style="text-align:center; padding:5px;"><b>Tọa độ:</b><br/><span style="user-select:all; font-family:monospace; background:#eee; padding:2px 4px;">${lat}, ${lng}</span></div>`).openOn(map);
+            });
+        }
+
+        function loadData(url, type) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(url, {
+                    download: true, header: true, skipEmptyLines: true,
+                    complete: (res) => {
+                        if (res.data && res.data.length > 0) {
+                            res.data.forEach(row => {
+                                if (type === 'street_label') createStreetLabel(row.Ten, row.Lat, row.Lng, row.GocXoay || 0);
+                                else processLocation(row, type);
+                            });
+                        }
+                        resolve();
+                    },
+                    error: (err) => reject("Lỗi tải CSV: " + err)
+                });
+            });
+        }
+
+        function processLocation(row, type) {
+            if (!row.Lat || !row.Lng || !row.Ten) return;
+            const config = THEME[type];
+            
+            // --- FIX ẢNH: Cắt chuỗi bằng dấu phẩy HOẶC xuống dòng ---
+            const rawAnh = row.Anh || row.anh || ""; 
+            // Regex: Cắt khi gặp dấu phẩy (,) hoặc xuống dòng (\n) hoặc chấm phẩy (;)
+            const imgs = rawAnh ? rawAnh.split(/[,\n;]+/).map(s => s.trim()).filter(s => s.startsWith('http')) : [];
+            const mainImg = imgs[0] || "https://placehold.co/400x200?text=No+Image";
+
+            const icon = L.divIcon({
+                className: 'custom-pin',
+                html: `<div class="pulse"></div><div class="marker-pin" style="background:${config.color};"><i class="fas ${config.icon}"></i></div>`,
+                iconSize: [34, 34], iconAnchor: [17, 34], popupAnchor: [0, -34]
+            });
+
+            let galleryHtml = `<div class="gallery-container">`;
+            if (imgs.length === 0) galleryHtml += `<img src="${mainImg}" class="gallery-item">`;
+            else imgs.forEach(u => galleryHtml += `<img src="${u}" class="gallery-item" onclick="window.viewFullImage(this.src)" onerror="this.src='https://placehold.co/400x200'">`);
+            galleryHtml += `</div>`;
+
+            const popupHtml = `${galleryHtml}<div class="popup-body"><span class="popup-title">${row.Ten}</span><p class="popup-desc">${row.MoTa || ''}</p><button class="btn-dir" onclick="window.navTo(${row.Lat}, ${row.Lng})"><i class="fas fa-directions"></i> CHỈ ĐƯỜNG</button></div>`;
+            const marker = L.marker([parseFloat(row.Lat), parseFloat(row.Lng)], { icon: icon }).bindPopup(popupHtml);
+
+            const el = document.createElement('li');
+            el.className = 'location-item';
+            el.innerHTML = `<img src="${mainImg}" class="item-thumb"><div class="item-info"><h3>${row.Ten}</h3><span>Phú Quý ${imgs.length > 1 ? `(${imgs.length} ảnh)` : ''}</span></div>`;
+            el.onclick = () => { map.flyTo([row.Lat, row.Lng], 18); marker.openPopup(); };
+
+            globalLocations.push({ data: row, type, marker, el });
+        }
+
+        function createStreetLabel(name, lat, lng, rot) {
+            const marker = L.marker([parseFloat(lat), parseFloat(lng)], { 
+                icon: L.divIcon({ className: 'st-lbl-c', html: `<div class="street-label" style="transform: rotate(${rot}deg);">${name}</div>`, iconSize: [100, 20], iconAnchor: [50, 10] }),
+                draggable: isAdmin 
+            }).addTo(streetGroup);
+
+            const labelObj = { name, lat, lng, rotation: rot, marker };
+            streetLabels.push(labelObj);
+
+            if (isAdmin) {
+                marker.on('dragend', () => { const p = marker.getLatLng(); labelObj.lat = p.lat; labelObj.lng = p.lng; });
+                marker.on('click', () => {
+                    const pop = L.popup().setContent(`<div class="admin-popup"><b id="ed-name" contenteditable="true">${labelObj.name}</b><br/><input type="range" class="rot-sld" min="0" max="360" value="${labelObj.rotation}"><div id="v-rot">${labelObj.rotation}°</div><button onclick="deleteStreet('${labelObj.name}', ${labelObj.lat})">XÓA</button></div>`);
+                    marker.bindPopup(pop).openPopup();
+                    setTimeout(() => {
+                        const sld = document.querySelector('.rot-sld'), nb = document.getElementById('ed-name');
+                        sld.oninput = (e) => {
+                            labelObj.rotation = e.target.value; document.getElementById('v-rot').innerText = e.target.value + '°';
+                            marker.setIcon(L.divIcon({ className: 'st-lbl-c', html: `<div class="street-label" style="transform:rotate(${labelObj.rotation}deg);">${labelObj.name}</div>`, iconSize:[100,20], iconAnchor:[50,10] }));
+                        };
+                        nb.oninput = (e) => {
+                            labelObj.name = e.target.innerText;
+                            marker.setIcon(L.divIcon({ className: 'st-lbl-c', html: `<div class="street-label" style="transform:rotate(${labelObj.rotation}deg);">${labelObj.name}</div>`, iconSize:[100,20], iconAnchor:[50,10] }));
+                        };
+                    }, 100);
+                });
+            }
+        }
+
+        window.deleteStreet = (n, la) => { const i = streetLabels.findIndex(l => l.name === n && l.lat === la); if (i > -1) { map.removeLayer(streetLabels[i].marker); streetLabels.splice(i, 1); } };
+
+        function exportStreetData() {
+            let csv = "Ten,Lat,Lng,GocXoay\n";
+            streetLabels.forEach(l => csv += `"${l.name}",${l.lat.toFixed(6)},${l.lng.toFixed(6)},${l.rotation}\n`);
+            const area = document.createElement('textarea');
+            area.value = csv; area.style.cssText = "position:fixed; top:50px; left:50%; transform:translateX(-50%); width:80%; height:300px; z-index:10000; padding:20px;";
+            area.onclick = () => area.remove(); document.body.appendChild(area);
+            alert("Đã tạo CSV. Copy dữ liệu dán vào Google Sheet.");
+        }
+
+        window.navTo = function(dLat, dLng) {
+            const start = L.latLng(10.5015, 108.9300);
+            const draw = (s) => {
+                if (routingControl) map.removeControl(routingControl);
+                routingControl = L.Routing.control({
+                    waypoints: [s, L.latLng(dLat, dLng)],
+                    routeWhileDragging: false, showAlternatives: false, fitSelectedRoutes: true,
+                    lineOptions: { styles: [{color: '#FFFF00', opacity: 1, weight: 6}] },
+                    createMarker: (i, wp) => i === 0 ? L.marker(wp.latLng) : null
+                }).addTo(map);
+                map.closePopup();
+            };
+            if (navigator.geolocation) navigator.geolocation.getCurrentPosition(p => draw(L.latLng(p.coords.latitude, p.coords.longitude)), () => draw(start), { timeout: 5000 });
+            else draw(start);
+        };
+
+        function applyFilter(t) { currentFilter = t; document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.classList.contains(t))); updateUI(); }
+        function setupSearch() { document.getElementById('search-input').oninput = e => { currentSearch = e.target.value.toLowerCase().trim(); updateUI(); }; }
+
+        function updateUI() {
+            const list = document.getElementById('location-list-container'); list.innerHTML = '';
+            locationGroup.clearLayers(); let count = 0;
+            globalLocations.forEach(item => {
+                if ((currentFilter === 'all' || item.type === currentFilter) && (currentSearch === '' || item.data.Ten.toLowerCase().includes(currentSearch))) {
+                    list.appendChild(item.el); locationGroup.addLayer(item.marker); count++;
+                }
+            });
+            document.getElementById('data-counter').innerText = `Tìm thấy: ${count} địa điểm`;
+        }
+
+        init();
+    </script>
+    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
+</body>
+</html>
