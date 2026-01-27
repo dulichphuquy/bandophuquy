@@ -1,21 +1,134 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <title>Giới Thiệu</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - News Feed</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        body { 
-            background: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg') no-repeat center center fixed; 
-            background-size: cover; color: white; height: 100vh;
-            display: flex; align-items: center; justify-content: center; text-align: center;
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        
+        .hero-banner {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg');
+            background-size: cover; background-position: center;
+            color: white; padding: 60px 20px; text-align: center; border-radius: 0 0 20px 20px;
+            margin-bottom: 20px;
         }
-        .overlay { background: rgba(0,0,0,0.6); padding: 40px; border-radius: 15px; }
+
+        .news-card {
+            border: none; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px; transition: transform 0.2s; background: white; height: 100%; display: flex; flex-direction: column;
+        }
+        .news-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+        .news-header { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+        .avatar { width: 40px; height: 40px; background: #0d6efd; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 10px; }
+        .news-img { width: 100%; height: 200px; object-fit: cover; }
+        .news-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-content { flex-grow: 1; } /* Để đẩy nút xem chi tiết xuống đáy */
+        
+        /* Màu sắc cho từng loại tin */
+        .tag-CanhBao { color: #dc3545; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;}
+        .tag-TinTuc { color: #0d6efd; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;}
+        .tag-AmThuc { color: #198754; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;}
+        
+        #loading { text-align: center; padding: 50px; }
     </style>
 </head>
 <body>
-    <div class="container overlay">
-        <h1 class="display-4 fw-bold">CHÀO MỪNG ĐẾN PHÚ QUÝ</h1>
-        <p class="lead">Khám phá hòn ngọc thô giữa biển khơi qua Bản đồ số thông minh.</p>
+
+    <div class="hero-banner">
+        <h1 class="fw-bold">PHÚ QUÝ TOUR</h1>
+        <p>Thông tin cập nhật trực tiếp từ Đảo</p>
     </div>
+
+    <div class="container">
+        <div id="loading">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Đang tải tin mới nhất...</p>
+        </div>
+        
+        <div class="row" id="news-container">
+            </div>
+    </div>
+
+    <script>
+        // --- CẤU HÌNH ---
+        // BẠN DÁN LINK CSV CŨ CỦA BẠN VÀO ĐÂY (Không cần lấy link mới nếu vẫn dùng file cũ)
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(SHEET_URL)
+                .then(response => response.text())
+                .then(csvText => {
+                    const rows = csvToArray(csvText);
+                    renderNews(rows);
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                    document.getElementById('loading').innerHTML = '<p class="text-danger">Lỗi kết nối.</p>';
+                });
+        });
+
+        function renderNews(data) {
+            const container = document.getElementById('news-container');
+            document.getElementById('loading').style.display = 'none';
+
+            // Duyệt danh sách tin
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row[1]) continue; 
+
+                // Đọc dữ liệu từ 6 cột (0 đến 5)
+                const loaiTin = row[0]; 
+                const tieuDe = row[1];  
+                const noiDung = row[2]; 
+                const anh = row[3];     
+                const link = row[4];    
+                
+                // --- MỚI: Đọc cột thời gian (Cột F tương ứng số 5) ---
+                // Nếu quên nhập thì mặc định hiện "Vừa xong"
+                const thoiGian = row[5] ? row[5] : "Vừa xong"; 
+
+                // Chọn icon
+                let icon = 'bi-info-circle';
+                if(loaiTin == 'CanhBao') icon = 'bi-exclamation-triangle-fill text-danger';
+                if(loaiTin == 'AmThuc') icon = 'bi-cup-hot-fill text-success';
+                if(loaiTin == 'CheckIn') icon = 'bi-camera-fill text-primary';
+
+                const html = `
+                <div class="col-md-4 mb-4">
+                    <div class="news-card">
+                        <div class="news-header">
+                            <div class="avatar"><i class="bi ${icon}"></i></div>
+                            <div>
+                                <div class="fw-bold">Admin Phú Quý</div>
+                                <small class="text-muted"><i class="bi bi-clock"></i> ${thoiGian}</small>
+                            </div>
+                        </div>
+                        ${anh ? `<img src="${anh}" class="news-img">` : ''}
+                        <div class="news-body">
+                            <div class="news-content">
+                                <span class="tag-${loaiTin}">#${loaiTin}</span>
+                                <h5 class="fw-bold mt-2">${tieuDe}</h5>
+                                <p class="text-secondary">${noiDung}</p>
+                            </div>
+                            ${link ? `<a href="${link}" class="btn btn-sm btn-outline-primary w-100 mt-3">Xem chi tiết</a>` : ''}
+                        </div>
+                    </div>
+                </div>
+                `;
+                container.insertAdjacentHTML('afterbegin', html);
+            }
+        }
+
+        function csvToArray(str) {
+            const rows = str.slice(str.indexOf("\n") + 1).split("\n");
+            return rows.map(function (row) {
+                const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+                return row.split(regex).map(val => val.replace(/^"|"$/g, '').trim());
+            });
+        }
+    </script>
 </body>
 </html>
