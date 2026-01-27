@@ -3,153 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Glassmorphism Pro Banner</title>
+    <title>Trang Chủ - Glassmorphism Pro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        /* Nền trong suốt */
+        /* GIỮ NGUYÊN GIAO DIỆN ĐẸP CỦA BẠN */
         body { background: transparent; font-family: 'Segoe UI', sans-serif; color: white; }
         
-        /* --- THIẾT KẾ BANNER MỚI: "CỔNG NĂNG LƯỢNG" --- */
+        /* BANNER */
         .hero-banner-pro {
-            /* Kính tối màu để chữ nổi hơn */
-            background: rgba(0, 20, 40, 0.5); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 25px;
-            padding: 50px 30px; 
-            margin-top: 30px; margin-bottom: 40px; 
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            /* Viền và bóng phát sáng Neon */
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
-            /* Hiệu ứng nhịp thở (Pulse Animation) */
+            background: rgba(0, 20, 40, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-radius: 25px; padding: 50px 30px; margin-top: 30px; margin-bottom: 40px; 
+            text-align: center; position: relative; overflow: hidden;
+            border: 1px solid rgba(0, 210, 255, 0.3); box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
             animation: neonPulse 4s infinite ease-in-out;
         }
-
-        /* Định nghĩa chuyển động nhịp thở */
         @keyframes neonPulse {
             0% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.15); border-color: rgba(0, 210, 255, 0.3); }
             50% { box-shadow: 0 0 60px rgba(0, 210, 255, 0.4); border-color: rgba(0, 210, 255, 0.6); }
             100% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.15); border-color: rgba(0, 210, 255, 0.3); }
         }
-        
-        /* Icon khổng lồ phát sáng */
-        .hero-icon-wrapper {
-            font-size: 4rem;
-            color: #00d2ff;
-            margin-bottom: 20px;
-            /* Tạo bóng sáng 3 lớp cho icon */
-            filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.8)) 
-                    drop-shadow(0 0 20px rgba(0, 210, 255, 0.4));
-        }
+        .hero-icon-wrapper { font-size: 4rem; color: #00d2ff; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.8)); }
+        .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 15px #00d2ff; }
+        .hero-subtitle { font-size: 1.2rem; color: rgba(255, 255, 255, 0.8); font-weight: 300; letter-spacing: 1px; }
 
-        .hero-title {
-            font-size: 3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 4px;
-            margin-bottom: 10px;
-            /* Chữ Neon trắng xanh */
-            color: #fff;
-            text-shadow: 0 0 15px #00d2ff, 0 0 30px #00d2ff;
-        }
-
-        .hero-subtitle {
-            font-size: 1.2rem; color: rgba(255, 255, 255, 0.8); font-weight: 300;
-            letter-spacing: 1px;
-        }
-        .hero-subtitle i { color: #00d2ff; margin-right: 8px; }
-
-
-        /* --- CÁC PHẦN CŨ (GIỮ NGUYÊN) --- */
+        /* CARD TIN TỨC */
         .news-card {
             background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin-bottom: 25px; overflow: hidden;
-            transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); height: 100%; display: flex; flex-direction: column;
         }
-        .news-card:hover {
-            transform: translateY(-10px) scale(1.02); background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 20px rgba(255, 193, 7, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2); border-color: rgba(255, 193, 7, 0.8); cursor: pointer;
-        }
-        .news-card:active { transform: scale(0.98); }
+        .news-card:hover { transform: translateY(-10px) scale(1.02); background: rgba(255, 255, 255, 0.15); box-shadow: 0 0 20px rgba(255, 193, 7, 0.6); border-color: rgba(255, 193, 7, 0.8); cursor: pointer; }
         .news-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; }
-        .avatar { 
-            width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            margin-right: 12px; font-size: 1.2rem; background: linear-gradient(45deg, #00d2ff, #3a7bd5); box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
-        }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.2rem; background: linear-gradient(45deg, #00d2ff, #3a7bd5); box-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
         .news-img { width: 100%; height: 200px; object-fit: cover; opacity: 0.9; transition: 0.3s; }
-        .news-card:hover .news-img { opacity: 1; }
-        .news-body { padding: 20px; }
-        .news-title { font-weight: bold; color: #fff; margin-top: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-        .news-desc { color: rgba(255,255,255,0.8); font-size: 0.9rem; }
+        .news-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-title { font-weight: bold; color: #fff; margin-top: 10px; }
+        .news-desc { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 15px; white-space: pre-line; } /* pre-line giúp hiển thị xuống dòng đúng */
         .badge-neon { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; border: 1px solid transparent; }
         .tag-CanhBao { background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border-color: #ff6b6b; box-shadow: 0 0 8px rgba(220, 53, 69, 0.4); }
         .tag-TinTuc { background: rgba(13, 110, 253, 0.2); color: #4dabf7; border-color: #4dabf7; box-shadow: 0 0 8px rgba(13, 110, 253, 0.4); }
         .tag-AmThuc { background: rgba(25, 135, 84, 0.2); color: #69db7c; border-color: #69db7c; box-shadow: 0 0 8px rgba(25, 135, 84, 0.4); }
-        .btn-neon { background: transparent; color: #00d2ff; border: 1px solid #00d2ff; border-radius: 50px; width: 100%; margin-top: 15px; transition: 0.3s; }
+        .tag-CheckIn { background: rgba(255, 193, 7, 0.2); color: #ffc107; border-color: #ffc107; box-shadow: 0 0 8px rgba(255, 193, 7, 0.4); }
+        .btn-neon { background: transparent; color: #00d2ff; border: 1px solid #00d2ff; border-radius: 50px; width: 100%; margin-top: auto; transition: 0.3s; }
         .btn-neon:hover { background: #00d2ff; color: #000; box-shadow: 0 0 15px #00d2ff; }
-        #loading { text-align: center; padding: 50px; color: white; text-shadow: 0 0 10px #000; }
+        #loading { text-align: center; padding: 50px; color: white; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="hero-banner-pro">
-            <div class="hero-icon-wrapper">
-                <i class="bi bi-gem"></i>
-            </div>
+            <div class="hero-icon-wrapper"><i class="bi bi-gem"></i></div>
             <h1 class="hero-title">PHÚ QUÝ TRAVEL</h1>
-            <p class="hero-subtitle">
-                <i class="bi bi-activity"></i> Cổng thông tin du lịch trực tuyến 24/7
-            </p>
+            <p class="hero-subtitle"><i class="bi bi-activity"></i> Cổng thông tin du lịch trực tuyến 24/7</p>
         </div>
 
         <div id="loading">
             <div class="spinner-border text-info" role="status"></div>
-            <p class="mt-2">Đang kết nối vệ tinh...</p>
+            <p class="mt-2">Đang tải dữ liệu...</p>
         </div>
         
-        <div class="row" id="news-container">
-            </div>
+        <div class="row" id="news-container"></div>
     </div>
 
     <script>
         // --- CẤU HÌNH ---
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; // <--- DÁN LINK CSV CỦA BẠN VÀO ĐÂY
+        // Link CSV của bạn (Đã điền sẵn)
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
         const DEFAULT_IMG = 'https://media.vneconomy.vn/w800/images/upload/2023/04/27/dao-phu-quy-binh-thuan.jpg';
 
         document.addEventListener('DOMContentLoaded', function() {
-            fetch(SHEET_URL).then(r => r.text()).then(t => {
-                renderNews(csvToArray(t));
-            }).catch(e => console.error(e));
+            fetch(SHEET_URL)
+                .then(response => response.text())
+                .then(csvText => {
+                    const rows = parseCSV(csvText); // Dùng bộ đọc CSV thông minh
+                    renderNews(rows);
+                })
+                .catch(error => {
+                    console.error(error);
+                    document.getElementById('loading').innerHTML = '<p class="text-danger">Lỗi kết nối.</p>';
+                });
         });
 
         function renderNews(data) {
             const container = document.getElementById('news-container');
             document.getElementById('loading').style.display = 'none';
 
-            for (let i = 1; i < data.length; i++) {
-                const row = data[i];
-                if (!row[1]) continue; 
+            data.forEach((row, index) => {
+                if (index === 0) return; // Bỏ dòng tiêu đề
+                // Kiểm tra xem dòng có đủ dữ liệu không
+                if (!row || row.length < 2 || !row[1]) return;
 
-                const [loaiTin, tieuDe, noiDung, anhRaw, link, thoiGian] = row;
+                // Lấy dữ liệu an toàn
+                const loaiTin = row[0] || 'TinTuc';
+                const tieuDe = row[1];
+                const noiDung = row[2] || '';
+                let anhRaw = row[3] || '';
+                const link = row[4] || '#';
+                const thoiGian = row[5] || 'Mới đây';
+
                 let anh = (!anhRaw || anhRaw.length < 10) ? DEFAULT_IMG : anhRaw;
                 
                 let icon = 'bi-info-circle';
                 if(loaiTin == 'CanhBao') icon = 'bi-megaphone-fill';
                 if(loaiTin == 'AmThuc') icon = 'bi-cup-hot-fill';
+                if(loaiTin == 'CheckIn') icon = 'bi-geo-alt-fill';
 
                 const html = `
-                <div class="col-md-4 col-sm-6">
+                <div class="col-md-4 col-sm-6 mb-4">
                     <div class="news-card">
                         <div class="news-header">
                             <div class="avatar"><i class="bi ${icon}"></i></div>
                             <div>
                                 <div class="fw-bold">Admin</div>
-                                <small style="font-size: 0.75rem; opacity: 0.7"><i class="bi bi-clock"></i> ${thoiGian || 'Mới đây'}</small>
+                                <small style="font-size: 0.75rem; opacity: 0.7"><i class="bi bi-clock"></i> ${thoiGian}</small>
                             </div>
                         </div>
-                        <img src="${anh}" class="news-img">
+                        <div style="height: 200px; overflow: hidden;">
+                             <img src="${anh}" class="news-img" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
                         <div class="news-body">
                             <span class="badge-neon tag-${loaiTin}">#${loaiTin}</span>
                             <h5 class="news-title">${tieuDe}</h5>
@@ -158,15 +131,32 @@
                         </div>
                     </div>
                 </div>`;
+                
+                // Đưa tin mới nhất (dòng dưới cùng của sheet) lên đầu web
                 container.insertAdjacentHTML('afterbegin', html);
-            }
-        }
-        function csvToArray(str) {
-            const rows = str.slice(str.indexOf("\n") + 1).split("\n");
-            return rows.map(function (row) {
-                const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
-                return row.split(regex).map(val => val.replace(/^"|"$/g, '').trim());
             });
+        }
+
+        // --- HÀM XỬ LÝ CSV CHUẨN (Khắc phục lỗi xuống dòng) ---
+        // Hàm này đọc từng ký tự để không bị lừa bởi dấu xuống dòng trong Excel
+        function parseCSV(str) {
+            const arr = [];
+            let quote = false;  
+            let row = 0, col = 0, c = 0;
+            for (; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];        
+                arr[row] = arr[row] || [];             
+                arr[row][col] = arr[row][col] || '';   
+
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; ++c; continue; } 
+
+                arr[row][col] += cc;
+            }
+            return arr;
         }
     </script>
 </body>
