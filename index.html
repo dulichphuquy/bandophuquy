@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        /* Hình nền toàn trang chính (Sẽ nhìn xuyên thấu qua các lớp kính) */
+        /* Hình nền toàn trang */
         body {
             background: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg') no-repeat center center fixed;
             background-size: cover;
@@ -15,85 +15,78 @@
             overflow: hidden;
         }
 
-        /* --- HIỆU ỨNG KÍNH MỜ (GLASSMORPHISM) CHO MENU --- */
+        /* --- SỬA LẠI: HIỆU ỨNG KÍNH RÂM (DARK GLASS) --- */
         .sidebar {
             height: 100vh; width: 260px; position: fixed; top: 0; left: 0;
-            /* Màu trắng trong suốt 10% */
-            background: rgba(255, 255, 255, 0.1);
-            /* Hiệu ứng làm mờ hậu cảnh */
+            /* Thay đổi: Dùng màu đen mờ thay vì trắng mờ để chữ nổi hơn */
+            background: rgba(0, 20, 40, 0.6); 
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            /* Viền neon nhẹ bên phải */
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); /* Bóng đổ đậm hơn */
             padding-top: 30px; color: white; z-index: 1000;
         }
 
         .sidebar-brand {
             text-align: center; font-weight: 800; font-size: 24px; margin-bottom: 40px;
-            text-shadow: 0 0 10px #00d2ff, 0 0 20px #00d2ff; /* Chữ phát sáng neon xanh */
+            color: #fff;
+            text-shadow: 0 0 10px #00d2ff, 0 0 20px #00d2ff;
             letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-left: 20px; margin-right: 20px;
         }
 
-        /* --- NÚT BẤM SIÊU TƯƠNG TÁC --- */
+        /* --- SỬA LẠI: NÚT BẤM DỄ ĐỌC HƠN --- */
         .sidebar a {
-            padding: 15px 25px; margin: 5px 15px; border-radius: 12px;
-            text-decoration: none; font-size: 16px; color: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px; margin: 8px 15px; border-radius: 12px;
+            text-decoration: none; font-size: 16px; 
+            color: rgba(255, 255, 255, 0.8); /* Chữ xám trắng dịu mắt */
             display: flex; align-items: center; cursor: pointer;
-            transition: all 0.3s ease; /* Chuyển động mượt mà */
+            transition: all 0.3s ease;
             border: 1px solid transparent;
+            font-weight: 500;
         }
 
-        /* Hiệu ứng khi di chuột vào (Hover) */
+        /* Khi di chuột vào: Nền sáng nhẹ, không quá chói */
         .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.6); /* Phát sáng neon xanh */
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            transform: translateX(5px); /* Dịch chuyển nhẹ sang phải */
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+            transform: translateX(5px);
         }
 
-        /* Hiệu ứng khi ĐANG BẤM CHUỘT (Click/Active) */
-        .sidebar a:active {
-            transform: scale(0.95); /* Thu nhỏ lại tạo cảm giác nhấn */
-            box-shadow: 0 0 5px rgba(0, 210, 255, 0.8);
-        }
-
-        /* Trạng thái đang chọn */
+        /* --- TRẠNG THÁI ĐANG CHỌN (ACTIVE) --- */
         .sidebar a.active {
-            background: linear-gradient(90deg, rgba(0, 210, 255, 0.4), rgba(0, 210, 255, 0.1));
-            border-left: 4px solid #fff;
+            /* Dùng gradient xanh đậm để chữ trắng nổi bật */
+            background: linear-gradient(90deg, rgba(0, 210, 255, 0.8), rgba(0, 100, 200, 0.8));
             color: #fff;
             font-weight: bold;
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+            border: none;
         }
 
-        .sidebar i { margin-right: 12px; font-size: 1.2rem; }
+        .sidebar i { margin-right: 12px; font-size: 1.3rem; }
 
-        /* --- KHUNG NỘI DUNG --- */
-        .main-content {
-            margin-left: 260px; height: 100vh;
-            /* Nền trong suốt để thấy ảnh nền của body */
-            background: transparent; 
-        }
+        /* Khung nội dung */
+        .main-content { margin-left: 260px; height: 100vh; background: transparent; }
         #content-frame { width: 100%; height: 100%; border: none; }
 
-        /* --- MOBILE --- */
+        /* Mobile */
         @media screen and (max-width: 768px) {
             .sidebar { display: none; }
             .main-content { margin-left: 0; height: calc(100vh - 65px); }
-            
             .mobile-nav {
                 position: fixed; bottom: 0; width: 100%; height: 65px;
-                background: rgba(255, 255, 255, 0.9); /* Kính đục hơn chút cho dễ nhìn */
+                background: rgba(0, 20, 40, 0.9); /* Menu mobile cũng tối màu */
                 backdrop-filter: blur(10px);
-                border-top: 1px solid rgba(255, 255, 255, 0.5);
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
                 display: flex; justify-content: space-around; align-items: center; z-index: 1000;
             }
             .mobile-nav-item { 
-                text-align: center; font-size: 11px; color: #444; width: 25%; text-decoration: none;
-                transition: transform 0.2s;
+                text-align: center; font-size: 11px; color: #aaa; width: 25%; text-decoration: none;
             }
-            .mobile-nav-item:active { transform: scale(0.8); } /* Hiệu ứng bấm trên điện thoại */
             .mobile-nav-item i { font-size: 22px; display: block; margin-bottom: 3px; }
             .mobile-nav-item.active { color: #00d2ff; font-weight: bold; text-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
         }
@@ -102,11 +95,11 @@
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-brand"><i class="bi bi-geo-alt-fill"></i> PHÚ QUÝ PRO</div>
-        <a onclick="loadPage('gioithieu.html', this)" class="menu-link active"><i class="bi bi-house-door"></i> Trang Chủ</a>
-        <a onclick="loadPage('bando.html', this)" class="menu-link"><i class="bi bi-map"></i> Bản Đồ Số</a>
-        <a onclick="loadPage('lichtau.html', this)" class="menu-link"><i class="bi bi-ferry"></i> Lịch Tàu</a>
-        <a onclick="loadPage('thoitiet.html', this)" class="menu-link"><i class="bi bi-cloud-sun"></i> Thời Tiết</a>
+        <div class="sidebar-brand"><i class="bi bi-gem"></i> PHÚ QUÝ PRO</div>
+        <a onclick="loadPage('gioithieu.html', this)" class="menu-link active"><i class="bi bi-house-door-fill"></i> Trang Chủ</a>
+        <a onclick="loadPage('bando.html', this)" class="menu-link"><i class="bi bi-map-fill"></i> Bản Đồ Số</a>
+        <a onclick="loadPage('lichtau.html', this)" class="menu-link"><i class="bi bi-ticket-perforated-fill"></i> Lịch Tàu</a>
+        <a onclick="loadPage('thoitiet.html', this)" class="menu-link"><i class="bi bi-cloud-sun-fill"></i> Thời Tiết</a>
     </div>
 
     <div class="main-content">
