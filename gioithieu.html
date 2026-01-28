@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Version 1.3</title>
+    <title>Trang Chủ - Version 1.4</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
+        /* --- GIAO DIỆN CHUNG --- */
         body { 
             background: transparent; 
             font-family: 'Segoe UI', sans-serif; 
@@ -23,13 +24,12 @@
             margin-top: 20px; margin-bottom: 40px; 
             text-align: center; position: relative; overflow: hidden;
             border: 1px solid rgba(0, 210, 255, 0.4); 
-            box-shadow: 0 0 40px rgba(0, 100, 255, 0.3); /* Bóng xanh dương */
+            box-shadow: 0 0 40px rgba(0, 100, 255, 0.3);
             transition: all 0.5s ease;
         }
         .banner-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /* Lớp phủ màu xanh đen mờ thay vì đen xì */
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0, 20, 60, 0.8));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0, 20, 60, 0.8));
             z-index: 1;
         }
         .banner-content { position: relative; z-index: 2; }
@@ -38,14 +38,15 @@
             font-size: 3.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px;
             text-shadow: 3px 3px 0px #000; 
         }
-        #banner-desc { font-size: 1.4rem; font-weight: 400; color: #e0f7fa; text-shadow: 2px 2px 0px #000; }
+        #banner-desc { 
+            font-size: 1.4rem; font-weight: 400; color: #e0f7fa; 
+            text-shadow: 2px 2px 0px #000; 
+        }
 
-        /* --- INFO CARDS (MÀU XANH MỚI) --- */
+        /* THẺ TIN (Màu Xanh Sapphire) */
         .info-card {
-            /* THAY ĐỔI: Dùng Gradient Xanh Sapphire Đậm */
             background: linear-gradient(145deg, rgba(0, 40, 80, 0.7), rgba(0, 15, 30, 0.85));
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            /* Viền xanh sáng nhẹ */
             border: 1px solid rgba(0, 200, 255, 0.2); 
             border-radius: 15px; margin-bottom: 25px; overflow: hidden; height: 100%; 
             display: flex; flex-direction: column; transition: all 0.3s ease;
@@ -54,7 +55,6 @@
 
         .info-card:hover {
             transform: translateY(-5px);
-            /* Viền sáng rực khi hover */
             border-color: #00d2ff; 
             background: linear-gradient(145deg, rgba(0, 60, 110, 0.8), rgba(0, 20, 40, 0.9));
             box-shadow: 0 10px 30px rgba(0, 100, 255, 0.3);
@@ -69,7 +69,6 @@
         .card-meta { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
         .badge-custom { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; text-shadow: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         
-        /* Màu badge tươi hơn */
         .bg-TinTuc { background-color: #007bff; color: white; }
         .bg-DiaDiem { background-color: #00c853; color: white; }
         .bg-CanhBao { background-color: #ff1744; color: white; }
@@ -96,20 +95,20 @@
             <div class="banner-overlay"></div>
             <div class="banner-content">
                 <h1 id="banner-title">PHÚ QUÝ TRAVEL</h1>
-                <p id="banner-desc"><i class="bi bi-broadcast"></i> Đang tải dữ liệu...</p>
+                <p id="banner-desc"><i class="bi bi-geo-alt-fill"></i> Khám phá vẻ đẹp hoang sơ</p>
             </div>
         </div>
 
         <div id="loading">
             <div class="spinner-border text-info" role="status"></div>
-            <p class="mt-2 text-white-50">Đang kết nối vệ tinh...</p>
+            <p class="mt-2 text-white-50">Đang kết nối...</p>
         </div>
         
         <div class="row" id="dynamic-grid"></div>
     </div>
 
     <script>
-        // --- CẤU HÌNH V1.3 ---
+        // --- CẤU HÌNH V1.4 ---
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
         const DEFAULT_IMG = 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg';
 
@@ -119,31 +118,39 @@
                 .then(t => { renderPage(parseCSV(t)); })
                 .catch(e => {
                     console.error("Lỗi:", e);
-                    document.getElementById('loading').innerHTML = '<p class="text-danger bg-white p-2 rounded">Lỗi kết nối.</p>';
+                    // Dù lỗi cũng phải tắt loading để giao diện không bị treo
+                    document.getElementById('loading').style.display = 'none';
                 });
         });
 
         function renderPage(data) {
+            // Tắt ngay biểu tượng loading
             document.getElementById('loading').style.display = 'none';
             const grid = document.getElementById('dynamic-grid');
             
-            // BANNER (Dòng 2 Sheet)
-            if (data.length > 1) {
-                const bannerRow = data[1]; 
-                if (bannerRow[1]) {
-                    document.getElementById('banner-title').innerText = bannerRow[1];
-                    document.getElementById('banner-desc').innerText = bannerRow[2];
-                    const bannerImg = (bannerRow[3] && bannerRow[3].length > 5) ? bannerRow[3] : DEFAULT_IMG;
-                    document.getElementById('main-banner').style.backgroundImage = `url('${bannerImg}')`;
-                }
+            // --- XỬ LÝ 1: BANNER ---
+            // Tìm dòng nào có chữ 'BANNER' để làm ảnh bìa (Không phụ thuộc thứ tự dòng)
+            const bannerRow = data.find(row => row[0] && row[0].toUpperCase().trim() === 'BANNER');
+            if (bannerRow) {
+                if (bannerRow[1]) document.getElementById('banner-title').innerText = bannerRow[1];
+                if (bannerRow[2]) document.getElementById('banner-desc').innerText = bannerRow[2];
+                const bannerImg = (bannerRow[3] && bannerRow[3].length > 5) ? bannerRow[3] : DEFAULT_IMG;
+                document.getElementById('main-banner').style.backgroundImage = `url('${bannerImg}')`;
             }
 
-            // CARDS (Từ Dòng 3 Sheet)
-            for (let i = 2; i < data.length; i++) {
+            // --- XỬ LÝ 2: TIN TỨC ---
+            // Duyệt tất cả các dòng, bỏ qua dòng tiêu đề (i=0)
+            for (let i = 1; i < data.length; i++) {
                 const row = data[i];
                 if (!row || !row[1]) continue;
 
                 const loai = row[0].trim() || 'TinTuc';
+
+                // [QUAN TRỌNG V1.4] BỘ LỌC THÔNG MINH
+                // Nếu dòng này là BANNER -> Bỏ qua (vì đã xử lý ở trên rồi)
+                // Giúp CHỐNG LẶP LẠI banner xuống dưới
+                if (loai.toUpperCase() === 'BANNER') continue;
+
                 const tieuDe = row[1];
                 const noiDung = row[2];
                 let anh = (row[3] && row[3].length > 5) ? row[3] : DEFAULT_IMG;
