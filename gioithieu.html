@@ -2,7 +2,202 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, i<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Version 1.1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        /* --- CẤU HÌNH GIAO DIỆN CHUNG --- */
+        body { 
+            /* V1.1 CHANGE: Thêm màu nền dự phòng #222 phòng khi ảnh nền không tải được */
+            background: transparent; 
+            font-family: 'Segoe UI', sans-serif; 
+            color: white; 
+            /* V1.1 NEW: Bóng đổ đen cho TOÀN BỘ chữ trên trang -> Đảm bảo luôn đọc được */
+            text-shadow: 0 1px 3px rgba(0,0,0, 0.9);
+        }
+        
+        /* --- PHẦN 1: BANNER CHÍNH --- */
+        #main-banner {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg');
+            background-size: cover; background-position: center;
+            border-radius: 20px; padding: 80px 40px; 
+            margin-top: 20px; margin-bottom: 40px; 
+            text-align: center; position: relative; overflow: hidden;
+            border: 1px solid rgba(0, 210, 255, 0.5); 
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2); 
+            transition: all 0.5s ease;
+        }
+        .banner-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* V1.1: Tăng độ tối overlay banner */
+            z-index: 1;
+        }
+        .banner-content { position: relative; z-index: 2; }
+
+        #banner-title {
+            font-size: 3.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px;
+            /* Bóng chữ cực mạnh cho tiêu đề */
+            text-shadow: 3px 3px 0px #000; 
+        }
+        #banner-desc {
+            font-size: 1.4rem; font-weight: 400; color: #f8f9fa;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        /* --- PHẦN 2: CÁC Ô THÔNG TIN (INFO CARDS) --- */
+        .info-card {
+            /* V1.1 CHANGE: Tăng độ đậm từ 0.7 lên 0.85 (Gần như đen) để chữ trắng nổi bật */
+            background: rgba(5, 15, 30, 0.85); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 15px; margin-bottom: 25px; overflow: hidden; height: 100%; 
+            display: flex; flex-direction: column; transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d2ff; 
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+        }
+
+        .card-img-wrapper { height: 180px; overflow: hidden; position: relative; }
+        .card-img-top { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .info-card:hover .card-img-top { transform: scale(1.1); }
+
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .card-meta { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+        .badge-custom { 
+            padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; 
+            text-shadow: none; /* Badge không cần bóng vì nền đã đậm */
+        }
+        
+        /* Màu badge giữ nguyên */
+        .bg-TinTuc { background-color: #0d6efd; color: white; }
+        .bg-DiaDiem { background-color: #198754; color: white; }
+        .bg-CanhBao { background-color: #dc3545; color: white; }
+        .bg-ThoiTiet { background-color: #ffc107; color: black; }
+        
+        .card-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.4; }
+        .card-text { 
+            font-size: 0.9rem; 
+            color: #eee; /* V1.1: Đổi màu chữ nội dung sang trắng sáng hơn (thay vì xám) */
+            flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; 
+        }
+        
+        .btn-view {
+            margin-top: 15px; width: 100%;
+            background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white;
+            padding: 8px; border-radius: 50px; text-decoration: none; text-align: center; font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-view:hover { background: white; color: black; font-weight: bold; text-shadow: none; }
+
+        #loading { text-align: center; padding: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="main-banner">
+            <div class="banner-overlay"></div>
+            <div class="banner-content">
+                <h1 id="banner-title">PHÚ QUÝ TRAVEL</h1>
+                <p id="banner-desc"><i class="bi bi-broadcast"></i> Đang tải dữ liệu...</p>
+            </div>
+        </div>
+
+        <div id="loading">
+            <div class="spinner-border text-info" role="status"></div>
+            <p class="mt-2 text-white-50">Đang kết nối vệ tinh...</p>
+        </div>
+        
+        <div class="row" id="dynamic-grid"></div>
+    </div>
+
+    <script>
+        // --- CẤU HÌNH HỆ THỐNG V1.1 ---
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
+        const DEFAULT_IMG = 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(SHEET_URL)
+                .then(r => r.text())
+                .then(t => { renderPage(parseCSV(t)); })
+                .catch(e => {
+                    console.error("Lỗi tải dữ liệu:", e);
+                    document.getElementById('loading').innerHTML = '<p class="text-danger bg-white p-2 rounded">Không thể kết nối máy chủ dữ liệu.</p>';
+                });
+        });
+
+        function renderPage(data) {
+            document.getElementById('loading').style.display = 'none';
+            const grid = document.getElementById('dynamic-grid');
+            
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row || !row[1]) continue;
+
+                const loai = row[0].trim();
+                const tieuDe = row[1];
+                const noiDung = row[2];
+                let anh = (row[3] && row[3].length > 5) ? row[3] : DEFAULT_IMG;
+                const link = row[4] || '#';
+                const thoiGian = row[5] || 'Mới đây';
+
+                if (loai.toUpperCase() === 'BANNER') {
+                    document.getElementById('banner-title').innerText = tieuDe;
+                    document.getElementById('banner-desc').innerText = noiDung;
+                    document.getElementById('main-banner').style.backgroundImage = `url('${anh}')`;
+                } else {
+                    const html = `
+                    <div class="col-md-4 col-sm-6">
+                        <div class="info-card">
+                            <div class="card-img-wrapper">
+                                <img src="${anh}" class="card-img-top">
+                            </div>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="badge-custom bg-${loai}">${loai}</span>
+                                    <small class="text-white-50" style="font-size: 0.75rem">${thoiGian}</small>
+                                </div>
+                                <h5 class="card-title">${tieuDe}</h5>
+                                <p class="card-text">${noiDung}</p>
+                                ${link !== '#' ? `<a href="${link}" class="btn-view">Xem chi tiết <i class="bi bi-arrow-right"></i></a>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                    grid.insertAdjacentHTML('afterbegin', html);
+                }
+            }
+        }
+
+        function parseCSV(str) {
+            const arr = [];
+            let quote = false;  
+            let row = 0, col = 0, c = 0;
+            for (; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];        
+                arr[row] = arr[row] || [];             
+                arr[row][col] = arr[row][col] || '';   
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; ++c; continue; } 
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
+    </script>
+</body>
+</html>nitial-scale=1.0">
     <title>Trang Chủ - Version 1.0</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
