@@ -3,142 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Glassmorphism Pro</title>
+    <title>Trang Chủ - Version 1.0</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
     <style>
-        /* GIỮ NGUYÊN GIAO DIỆN ĐẸP CỦA BẠN */
-        body { background: transparent; font-family: 'Segoe UI', sans-serif; color: white; }
+        /* --- CẤU HÌNH GIAO DIỆN CHUNG (CORE STYLE) --- */
+        body { 
+            background: transparent; /* Nền trong suốt để hiện ảnh nền từ index.html */
+            font-family: 'Segoe UI', sans-serif; 
+            color: white; 
+        }
         
-        /* BANNER */
-        .hero-banner-pro {
-            background: rgba(0, 20, 40, 0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-radius: 25px; padding: 50px 30px; margin-top: 30px; margin-bottom: 40px; 
-            text-align: center; position: relative; overflow: hidden;
-            border: 1px solid rgba(0, 210, 255, 0.3); box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
-            animation: neonPulse 4s infinite ease-in-out;
+        /* --- PHẦN 1: BANNER CHÍNH (DYNAMIC BANNER) --- */
+        #main-banner {
+            /* Ảnh mặc định (Fallback) */
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg');
+            background-size: cover; 
+            background-position: center;
+            border-radius: 20px;
+            padding: 80px 40px; 
+            margin-top: 20px; margin-bottom: 40px; 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden;
+            /* Viền Neon Xanh */
+            border: 1px solid rgba(0, 210, 255, 0.5); 
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.2); 
+            transition: all 0.5s ease;
         }
-        @keyframes neonPulse {
-            0% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.15); border-color: rgba(0, 210, 255, 0.3); }
-            50% { box-shadow: 0 0 60px rgba(0, 210, 255, 0.4); border-color: rgba(0, 210, 255, 0.6); }
-            100% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.15); border-color: rgba(0, 210, 255, 0.3); }
-        }
-        .hero-icon-wrapper { font-size: 4rem; color: #00d2ff; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(0, 210, 255, 0.8)); }
-        .hero-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 4px; color: #fff; text-shadow: 0 0 15px #00d2ff; }
-        .hero-subtitle { font-size: 1.2rem; color: rgba(255, 255, 255, 0.8); font-weight: 300; letter-spacing: 1px; }
 
-        /* CARD TIN TỨC */
-        .news-card {
-            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; margin-bottom: 25px; overflow: hidden;
-            transition: all 0.4s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2); height: 100%; display: flex; flex-direction: column;
+        /* Lớp phủ đen mờ (Overlay) giúp chữ luôn nổi bật */
+        .banner-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5); 
+            z-index: 1;
         }
-        .news-card:hover { transform: translateY(-10px) scale(1.02); background: rgba(255, 255, 255, 0.15); box-shadow: 0 0 20px rgba(255, 193, 7, 0.6); border-color: rgba(255, 193, 7, 0.8); cursor: pointer; }
-        .news-header { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.2rem; background: linear-gradient(45deg, #00d2ff, #3a7bd5); box-shadow: 0 0 10px rgba(0, 210, 255, 0.5); }
-        .news-img { width: 100%; height: 200px; object-fit: cover; opacity: 0.9; transition: 0.3s; }
-        .news-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .news-title { font-weight: bold; color: #fff; margin-top: 10px; }
-        .news-desc { color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 15px; white-space: pre-line; } /* pre-line giúp hiển thị xuống dòng đúng */
-        .badge-neon { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; border: 1px solid transparent; }
-        .tag-CanhBao { background: rgba(220, 53, 69, 0.2); color: #ff6b6b; border-color: #ff6b6b; box-shadow: 0 0 8px rgba(220, 53, 69, 0.4); }
-        .tag-TinTuc { background: rgba(13, 110, 253, 0.2); color: #4dabf7; border-color: #4dabf7; box-shadow: 0 0 8px rgba(13, 110, 253, 0.4); }
-        .tag-AmThuc { background: rgba(25, 135, 84, 0.2); color: #69db7c; border-color: #69db7c; box-shadow: 0 0 8px rgba(25, 135, 84, 0.4); }
-        .tag-CheckIn { background: rgba(255, 193, 7, 0.2); color: #ffc107; border-color: #ffc107; box-shadow: 0 0 8px rgba(255, 193, 7, 0.4); }
-        .btn-neon { background: transparent; color: #00d2ff; border: 1px solid #00d2ff; border-radius: 50px; width: 100%; margin-top: auto; transition: 0.3s; }
-        .btn-neon:hover { background: #00d2ff; color: #000; box-shadow: 0 0 15px #00d2ff; }
-        #loading { text-align: center; padding: 50px; color: white; }
+        
+        .banner-content { position: relative; z-index: 2; }
+
+        /* Typography cho Banner: Sắc nét, tương phản cao, KHÔNG Neon nhòe */
+        #banner-title {
+            font-size: 3.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9); 
+        }
+        #banner-desc {
+            font-size: 1.4rem; font-weight: 400; color: #f8f9fa;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+        }
+
+        /* --- PHẦN 2: CÁC Ô THÔNG TIN (INFO CARDS) --- */
+        .info-card {
+            background: rgba(0, 20, 40, 0.7); /* Kính tối màu (Dark Glass) */
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            overflow: hidden; 
+            height: 100%; 
+            display: flex; flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        /* Hiệu ứng tương tác khi di chuột (Hover) */
+        .info-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d2ff; /* Viền sáng lên */
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.3);
+        }
+
+        .card-img-wrapper { height: 180px; overflow: hidden; position: relative; }
+        .card-img-top { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .info-card:hover .card-img-top { transform: scale(1.1); } /* Ảnh phóng to nhẹ */
+
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        /* Nhãn phân loại (Tag) */
+        .card-meta { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+        .badge-custom { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        
+        /* Màu sắc cho từng loại tin */
+        .bg-TinTuc { background-color: #0d6efd; color: white; }
+        .bg-DiaDiem { background-color: #198754; color: white; }
+        .bg-CanhBao { background-color: #dc3545; color: white; }
+        .bg-ThoiTiet { background-color: #ffc107; color: black; }
+        
+        .card-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.4; }
+        .card-text { font-size: 0.9rem; color: #ced4da; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* Nút xem chi tiết */
+        .btn-view {
+            margin-top: 15px; width: 100%;
+            background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white;
+            padding: 8px; border-radius: 50px; text-decoration: none; text-align: center; font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-view:hover { background: white; color: black; font-weight: bold; }
+
+        /* Loading Spinner */
+        #loading { text-align: center; padding: 50px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="hero-banner-pro">
-            <div class="hero-icon-wrapper"><i class="bi bi-gem"></i></div>
-            <h1 class="hero-title">PHÚ QUÝ TRAVEL</h1>
-            <p class="hero-subtitle"><i class="bi bi-activity"></i> Cổng thông tin du lịch trực tuyến 24/7</p>
+        <div id="main-banner">
+            <div class="banner-overlay"></div>
+            <div class="banner-content">
+                <h1 id="banner-title">PHÚ QUÝ TRAVEL</h1>
+                <p id="banner-desc"><i class="bi bi-broadcast"></i> Đang tải dữ liệu...</p>
+            </div>
         </div>
 
         <div id="loading">
             <div class="spinner-border text-info" role="status"></div>
-            <p class="mt-2">Đang tải dữ liệu...</p>
+            <p class="mt-2 text-white-50">Đang kết nối vệ tinh...</p>
         </div>
         
-        <div class="row" id="news-container"></div>
+        <div class="row" id="dynamic-grid">
+            </div>
     </div>
 
     <script>
-        // --- CẤU HÌNH ---
-        // Link CSV của bạn (Đã điền sẵn)
+        // --- CẤU HÌNH HỆ THỐNG V1.0 ---
+        
+        // Link CSV Google Sheet (Đã xác nhận hoạt động)
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
-        const DEFAULT_IMG = 'https://media.vneconomy.vn/w800/images/upload/2023/04/27/dao-phu-quy-binh-thuan.jpg';
+        
+        // Ảnh dự phòng (Fallback Image)
+        const DEFAULT_IMG = 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg';
 
+        // --- HÀM KHỞI TẠO ---
         document.addEventListener('DOMContentLoaded', function() {
             fetch(SHEET_URL)
-                .then(response => response.text())
-                .then(csvText => {
-                    const rows = parseCSV(csvText); // Dùng bộ đọc CSV thông minh
-                    renderNews(rows);
+                .then(r => r.text())
+                .then(t => {
+                    const rows = parseCSV(t);
+                    renderPage(rows);
                 })
-                .catch(error => {
-                    console.error(error);
-                    document.getElementById('loading').innerHTML = '<p class="text-danger">Lỗi kết nối.</p>';
+                .catch(e => {
+                    console.error("Lỗi tải dữ liệu:", e);
+                    document.getElementById('loading').innerHTML = '<p class="text-danger">Không thể kết nối máy chủ dữ liệu.</p>';
                 });
         });
 
-        function renderNews(data) {
-            const container = document.getElementById('news-container');
+        // --- HÀM XỬ LÝ HIỂN THỊ (RENDER ENGINE V1.0) ---
+        function renderPage(data) {
             document.getElementById('loading').style.display = 'none';
+            const grid = document.getElementById('dynamic-grid');
+            
+            // Duyệt dữ liệu từ dòng 1 (Bỏ dòng tiêu đề 0)
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                if (!row || !row[1]) continue; // Bỏ qua dòng lỗi/trống
 
-            data.forEach((row, index) => {
-                if (index === 0) return; // Bỏ dòng tiêu đề
-                // Kiểm tra xem dòng có đủ dữ liệu không
-                if (!row || row.length < 2 || !row[1]) return;
+                // Mapping dữ liệu từ cột Sheet sang biến
+                const loai = row[0].trim(); // Cột A: Loại tin
+                const tieuDe = row[1];      // Cột B: Tiêu đề
+                const noiDung = row[2];     // Cột C: Nội dung
+                let anh = (row[3] && row[3].length > 5) ? row[3] : DEFAULT_IMG; // Cột D: Ảnh
+                const link = row[4] || '#'; // Cột E: Link
+                const thoiGian = row[5] || 'Mới đây'; // Cột F: Thời gian
 
-                // Lấy dữ liệu an toàn
-                const loaiTin = row[0] || 'TinTuc';
-                const tieuDe = row[1];
-                const noiDung = row[2] || '';
-                let anhRaw = row[3] || '';
-                const link = row[4] || '#';
-                const thoiGian = row[5] || 'Mới đây';
-
-                let anh = (!anhRaw || anhRaw.length < 10) ? DEFAULT_IMG : anhRaw;
-                
-                let icon = 'bi-info-circle';
-                if(loaiTin == 'CanhBao') icon = 'bi-megaphone-fill';
-                if(loaiTin == 'AmThuc') icon = 'bi-cup-hot-fill';
-                if(loaiTin == 'CheckIn') icon = 'bi-geo-alt-fill';
-
-                const html = `
-                <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="news-card">
-                        <div class="news-header">
-                            <div class="avatar"><i class="bi ${icon}"></i></div>
-                            <div>
-                                <div class="fw-bold">Admin</div>
-                                <small style="font-size: 0.75rem; opacity: 0.7"><i class="bi bi-clock"></i> ${thoiGian}</small>
+                // LOGIC 1: CẬP NHẬT BANNER
+                if (loai.toUpperCase() === 'BANNER') {
+                    document.getElementById('banner-title').innerText = tieuDe;
+                    document.getElementById('banner-desc').innerText = noiDung;
+                    document.getElementById('main-banner').style.backgroundImage = `url('${anh}')`;
+                } 
+                // LOGIC 2: TẠO THẺ TIN TỨC
+                else {
+                    const html = `
+                    <div class="col-md-4 col-sm-6">
+                        <div class="info-card">
+                            <div class="card-img-wrapper">
+                                <img src="${anh}" class="card-img-top">
+                            </div>
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    <span class="badge-custom bg-${loai}">${loai}</span>
+                                    <small class="text-white-50" style="font-size: 0.75rem">${thoiGian}</small>
+                                </div>
+                                <h5 class="card-title">${tieuDe}</h5>
+                                <p class="card-text">${noiDung}</p>
+                                ${link !== '#' ? `<a href="${link}" class="btn-view">Xem chi tiết <i class="bi bi-arrow-right"></i></a>` : ''}
                             </div>
                         </div>
-                        <div style="height: 200px; overflow: hidden;">
-                             <img src="${anh}" class="news-img" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div class="news-body">
-                            <span class="badge-neon tag-${loaiTin}">#${loaiTin}</span>
-                            <h5 class="news-title">${tieuDe}</h5>
-                            <p class="news-desc">${noiDung}</p>
-                            ${link && link !== '#' ? `<a href="${link}" class="btn btn-neon">Xem chi tiết</a>` : ''}
-                        </div>
                     </div>
-                </div>`;
-                
-                // Đưa tin mới nhất (dòng dưới cùng của sheet) lên đầu web
-                container.insertAdjacentHTML('afterbegin', html);
-            });
+                    `;
+                    // Chèn vào đầu danh sách
+                    grid.insertAdjacentHTML('afterbegin', html);
+                }
+            }
         }
 
-        // --- HÀM XỬ LÝ CSV CHUẨN (Khắc phục lỗi xuống dòng) ---
-        // Hàm này đọc từng ký tự để không bị lừa bởi dấu xuống dòng trong Excel
+        // --- HÀM HỖ TRỢ ĐỌC CSV (PARSER V1.0) ---
         function parseCSV(str) {
             const arr = [];
             let quote = false;  
@@ -147,13 +207,11 @@
                 let cc = str[c], nc = str[c+1];        
                 arr[row] = arr[row] || [];             
                 arr[row][col] = arr[row][col] || '';   
-
                 if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
                 if (cc == '"') { quote = !quote; continue; }
                 if (cc == ',' && !quote) { ++col; continue; }
                 if (cc == '\n' && !quote) { ++row; col = 0; continue; }
                 if (cc == '\r' && !quote) { ++row; col = 0; ++c; continue; } 
-
                 arr[row][col] += cc;
             }
             return arr;
