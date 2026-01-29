@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background: transparent; font-family: 'Segoe UI', sans-serif; color: white; padding: 10px; }
+        
+        /* HEADER */
+        .page-header { text-align: center; margin-bottom: 30px; margin-top: 20px; }
+        .page-title { 
+            font-weight: 900; color: #00d2ff; text-transform: uppercase; 
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.6); font-size: 2rem;
+        }
+
+        /* CARD */
+        .info-card {
+            background: linear-gradient(145deg, rgba(0, 40, 80, 0.7), rgba(0, 15, 30, 0.85));
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 200, 255, 0.2); 
+            border-radius: 15px; margin-bottom: 25px; overflow: hidden; height: 100%; 
+            display: flex; flex-direction: column; transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-5px); border-color: #00d2ff; 
+            box-shadow: 0 10px 30px rgba(0, 100, 255, 0.3);
+        }
+
+        .card-img-wrapper { height: 200px; overflow: hidden; position: relative; }
+        .card-img-top { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+        .info-card:hover .card-img-top { transform: scale(1.1); }
+
+        .view-badge {
+            position: absolute; bottom: 10px; right: 10px;
+            background: rgba(0,0,0,0.7); color: #fff;
+            padding: 3px 8px; border-radius: 4px; font-size: 0.75rem;
+            display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.25rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .card-text { font-size: 0.95rem; color: #e1f5fe; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .btn-view {
+            margin-top: 15px; width: 100%;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.4); color: white;
+            padding: 8px; border-radius: 50px; text-decoration: none; text-align: center; font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .btn-view:hover { background: #00d2ff; color: #002244; font-weight: bold; }
+
+        #loading { text-align: center; padding: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" id="page-name">DANH SÁCH</h1>
+        </div>
+
+        <div id="loading">
+            <div class="spinner-border text-info" role="status"></div>
+            <p class="mt-2 text-white-50">Đang tải dữ liệu...</p>
+        </div>
+        
+        <div class="row" id="dynamic-grid"></div>
+    </div>
+
+    <script>
+        // --- CẤU HÌNH ---
+        // 1. Dán Link CSV Sheet tương ứng vào đây
+        // Nếu là diadiem.html -> Dán link Sheet Địa Điểm
+        // Nếu là luutru.html -> Dán link Sheet Lưu Trú
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=1951403573&single=true&output=csv'; 
+        
+        // 2. Đặt tên tiêu đề trang (VD: KHÁM PHÁ ĐỊA ĐIỂM hoặc DỊCH VỤ LƯU TRÚ)
+        const PAGE_NAME = 'DỊCH VỤ LƯU TRÚ'; 
+
+        const DEFAULT_IMG = 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg';
+
+        document.getElementById('page-name').innerText = PAGE_NAME;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(SHEET_URL)
+                .then(r => r.text())
+                .then(t => renderList(parseCSV(t)))
+                .catch(e => {
+                    document.getElementById('loading').innerHTML = '<p class="text-danger">Lỗi kết nối.</p>';
+                });
+        });
+
+        function renderList(data) {
+            document.getElementById('loading').style.display = 'none';
+            const grid = document.getElementById('dynamic-grid');
+            
+            // Sắp xếp: Ai có Lượt xem (Cột G - index 6) cao hơn thì đứng trước
+            // Để khách trả tiền quảng cáo được lên đầu
+            const rows = data.slice(1).sort((a, b) => {
+                const viewA = parseInt((a[6] || '0').replace(/,/g, '')) || 0;
+                const viewB = parseInt((b[6] || '0').replace(/,/g, '')) || 0;
+                return viewB - viewA;
+            });
+
+            rows.forEach(row => {
+                if (!row[1]) return;
+
+                const tieuDe = row[1];
+                const noiDung = row[2];
+                let anh = (row[3] && row[3].length > 5) ? row[3] : DEFAULT_IMG;
+                const link = row[4] || '#';
+                const luotXem = row[6] || 'Mới';
+
+                const html = `
+                <div class="col-md-4 col-sm-6">
+                    <div class="info-card">
+                        <div class="card-img-wrapper">
+                            <img src="${anh}" class="card-img-top">
+                            <div class="view-badge"><i class="bi bi-eye-fill me-1"></i> ${luotXem}</div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">${tieuDe}</h5>
+                            <p class="card-text">${noiDung}</p>
+                            ${link !== '#' ? `<a href="${link}" class="btn-view">Xem chi tiết</a>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+                grid.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        function parseCSV(str) {
+            const arr = []; let quote = false; let row = 0, col = 0, c = 0;
+            for (; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];        
+                arr[row] = arr[row] || []; arr[row][col] = arr[row][col] || '';   
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; ++c; continue; } 
+                arr[row][col] += cc;
+            }
+            return arr;
+        }
+    </script>
+</body>
+</html>
