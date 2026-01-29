@@ -3,216 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Version 1.5</title>
+    <title>Trang Chủ - Version 1.6</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
-        /* --- GIAO DIỆN CHUNG --- */
         body { 
-            background: transparent; 
-            font-family: 'Segoe UI', sans-serif; 
-            color: white; 
-            text-shadow: 0 1px 2px rgba(0,0,0, 0.8);
+            background: transparent; font-family: 'Segoe UI', sans-serif; 
+            color: white; text-shadow: 0 1px 2px rgba(0,0,0, 0.8);
+        }
+
+        /* --- CAROUSEL BANNER (SLIDE) --- */
+        .carousel-container {
+            margin-top: 20px; margin-bottom: 30px;
+            border-radius: 20px; overflow: hidden;
+            border: 1px solid rgba(0, 210, 255, 0.4);
+            box-shadow: 0 0 40px rgba(0, 100, 255, 0.3);
+            position: relative;
+        }
+
+        .carousel-item {
+            height: 400px; /* Chiều cao cố định 3/4 */
         }
         
-        /* BANNER V1.5 */
-        #main-banner {
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg');
-            background-size: cover; background-position: center;
-            border-radius: 20px; 
-            /* GIẢM CHIỀU CAO: Padding từ 80px -> 50px */
-            padding: 50px 30px; 
-            margin-top: 20px; margin-bottom: 30px; 
-            text-align: center; position: relative; overflow: hidden;
-            border: 1px solid rgba(0, 210, 255, 0.4); 
-            box-shadow: 0 0 40px rgba(0, 100, 255, 0.3);
-            transition: all 0.5s ease;
+        .carousel-item img {
+            width: 100%; height: 100%; object-fit: cover;
         }
-        .banner-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0, 20, 60, 0.8));
-            z-index: 1;
-        }
-        .banner-content { position: relative; z-index: 2; width: 100%; }
 
-        /* TIÊU ĐỀ BANNER THÔNG MINH */
-        #banner-title {
-            /* QUAN TRỌNG: 
-               - clamp(20px, 5vw, 54pt) nghĩa là:
-               - Nhỏ nhất 20px (điện thoại)
-               - Bình thường là 5% chiều rộng web
-               - Lớn nhất là 54pt (khoảng 72px) -> KHÔNG BAO GIỜ TO HƠN MỨC NÀY
-            */
-            font-size: clamp(20px, 5vw, 72px); 
+        .carousel-caption {
+            background: linear-gradient(to top, rgba(0, 20, 60, 0.9), rgba(0,0,0,0));
+            bottom: 0; left: 0; right: 0; padding-bottom: 30px; padding-top: 80px;
+        }
+
+        /* Chữ thông minh Auto-fit */
+        .banner-title {
+            font-size: clamp(25px, 5vw, 60px); 
             font-weight: 800; text-transform: uppercase; margin-bottom: 5px;
-            text-shadow: 3px 3px 0px #000;
-            
-            /* Ép buộc luôn nằm trên 1 dòng */
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            line-height: 1.2;
+            text-shadow: 3px 3px 0px #000; white-space: nowrap;
         }
 
-        #banner-desc { 
-            font-size: 1.2rem; font-weight: 400; color: #e0f7fa; 
-            text-shadow: 2px 2px 0px #000; margin-bottom: 0;
+        /* Nút chuyển slide */
+        .carousel-control-prev, .carousel-control-next {
+            width: 5%; opacity: 0.7;
+        }
+        .carousel-control-prev-icon, .carousel-control-next-icon {
+            filter: drop-shadow(0 0 5px #00d2ff);
         }
 
-        /* BỘ ĐẾM TỔNG (Góc phải dưới Banner) */
+        /* BỘ ĐẾM TỔNG (Vẫn giữ ở góc) */
         .banner-counter {
-            position: absolute; bottom: 15px; right: 20px; z-index: 3;
+            position: absolute; bottom: 15px; right: 20px; z-index: 20;
             background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 20px;
             font-size: 0.9rem; color: #00d2ff; border: 1px solid rgba(0, 210, 255, 0.3);
-            display: flex; align-items: center;
         }
-        .banner-counter i { margin-right: 8px; animation: blink 2s infinite; }
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
 
-        /* --- THẺ TIN V1.5 --- */
+        /* --- THẺ TIN --- */
         .info-card {
             background: linear-gradient(145deg, rgba(0, 40, 80, 0.7), rgba(0, 15, 30, 0.85));
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 200, 255, 0.2); 
+            backdrop-filter: blur(15px); border: 1px solid rgba(0, 200, 255, 0.2); 
             border-radius: 15px; margin-bottom: 25px; overflow: hidden; height: 100%; 
             display: flex; flex-direction: column; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
         .info-card:hover {
-            transform: translateY(-5px);
-            border-color: #00d2ff; 
-            background: linear-gradient(145deg, rgba(0, 60, 110, 0.8), rgba(0, 20, 40, 0.9));
+            transform: translateY(-5px); border-color: #00d2ff; 
             box-shadow: 0 10px 30px rgba(0, 100, 255, 0.3);
         }
-
         .card-img-wrapper { height: 180px; overflow: hidden; position: relative; }
         .card-img-top { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
         .info-card:hover .card-img-top { transform: scale(1.1); }
-
-        /* VIEW COUNT (Trên từng thẻ) */
         .view-badge {
-            position: absolute; bottom: 10px; right: 10px;
-            background: rgba(0,0,0,0.7); color: #fff;
-            padding: 3px 8px; border-radius: 4px; font-size: 0.7rem;
-            display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.2);
+            position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); 
+            color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; border: 1px solid rgba(255,255,255,0.2);
         }
-        .view-badge i { margin-right: 4px; color: #00d2ff; }
-
         .card-body { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-meta { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
-        .badge-custom { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; text-shadow: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .badge-custom { padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
         
+        /* Màu sắc Badge */
         .bg-TinTuc { background-color: #007bff; color: white; }
         .bg-DiaDiem { background-color: #00c853; color: white; }
-        .bg-CanhBao { background-color: #ff1744; color: white; }
-        .bg-ThoiTiet { background-color: #ffd600; color: black; }
-        
-        .card-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 10px; line-height: 1.4; }
-        .card-text { font-size: 0.9rem; color: #e1f5fe; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-        
+        .bg-TopHot { background: linear-gradient(45deg, #ff0000, #ffc107); color: white; box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); } /* Màu riêng cho Top 1 */
+
+        .card-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .card-text { font-size: 0.9rem; color: #e1f5fe; flex-grow: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
         .btn-view {
-            margin-top: 15px; width: 100%;
-            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.4); color: white;
-            padding: 8px; border-radius: 50px; text-decoration: none; text-align: center; font-size: 0.9rem;
-            transition: 0.3s;
+            margin-top: 15px; width: 100%; background: rgba(255,255,255,0.1); 
+            border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px; border-radius: 50px; 
+            text-decoration: none; text-align: center; font-size: 0.9rem; transition: 0.3s;
         }
-        .btn-view:hover { background: #00d2ff; border-color: #00d2ff; color: #002244; font-weight: bold; text-shadow: none; }
+        .btn-view:hover { background: #00d2ff; color: #002244; font-weight: bold; }
+        
         #loading { text-align: center; padding: 50px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div id="main-banner">
-            <div class="banner-overlay"></div>
-            <div class="banner-content">
-                <h1 id="banner-title">PHÚ QUÝ TRAVEL</h1>
-                <p id="banner-desc"><i class="bi bi-geo-alt-fill"></i> Khám phá vẻ đẹp hoang sơ</p>
+        
+        <div class="carousel-container">
+            <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner" id="carousel-items"></div>
+                
+                <button class="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
             </div>
+
             <div class="banner-counter">
-                <i class="bi bi-eye-fill"></i> <span id="total-views">Đang đếm...</span>
+                <i class="bi bi-eye-fill"></i> <span id="total-views">Đang cập nhật...</span>
             </div>
         </div>
 
         <div id="loading">
             <div class="spinner-border text-info" role="status"></div>
-            <p class="mt-2 text-white-50">Đang kết nối...</p>
+            <p class="mt-2 text-white-50">Đang tải dữ liệu...</p>
         </div>
         
         <div class="row" id="dynamic-grid"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // --- CẤU HÌNH V1.5 ---
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
+        // --- CẤU HÌNH V1.6 ---
+        // 1. Link Sheet TRANG CHỦ (Chứa Banner & Tin tức)
+        const URL_HOME = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=0&single=true&output=csv'; 
+        
+        // 2. Link Sheet ĐỊA ĐIỂM (Chứa danh sách địa điểm để tìm Top Hot)
+        // [QUAN TRỌNG]: Bạn nhớ dán link CSV của sheet DiaDiem vào đây
+        const URL_DIADIEM = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=330502083&single=true&output=csv'; 
+
         const DEFAULT_IMG = 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Bai_Nho_-_Ganh_Hang.jpg';
 
         document.addEventListener('DOMContentLoaded', function() {
-            fetch(SHEET_URL)
-                .then(r => r.text())
-                .then(t => { renderPage(parseCSV(t)); })
-                .catch(e => {
-                    console.error("Lỗi:", e);
-                    document.getElementById('loading').style.display = 'none';
-                });
+            // Tải song song cả 2 sheet cùng lúc
+            Promise.all([
+                fetch(URL_HOME).then(r => r.text()),
+                fetch(URL_DIADIEM).then(r => r.text()) // Nếu chưa có sheet này thì code sẽ bỏ qua phần Top Hot
+            ])
+            .then(([csvHome, csvDiaDiem]) => {
+                const dataHome = parseCSV(csvHome);
+                const dataDiaDiem = parseCSV(csvDiaDiem);
+                renderPage(dataHome, dataDiaDiem);
+            })
+            .catch(e => {
+                console.error("Lỗi:", e);
+                // Nếu lỗi sheet địa điểm, vẫn cố hiển thị trang chủ
+                fetch(URL_HOME).then(r => r.text()).then(t => renderPage(parseCSV(t), [])).catch(err => console.log(err));
+            });
         });
 
-        function renderPage(data) {
+        function renderPage(homeData, diaDiemData) {
             document.getElementById('loading').style.display = 'none';
+            const carouselContainer = document.getElementById('carousel-items');
             const grid = document.getElementById('dynamic-grid');
             
-            // 1. BANNER
-            const bannerRow = data.find(row => row[0] && row[0].toUpperCase().trim() === 'BANNER');
-            if (bannerRow) {
-                if (bannerRow[1]) document.getElementById('banner-title').innerText = bannerRow[1];
-                if (bannerRow[2]) document.getElementById('banner-desc').innerText = bannerRow[2];
-                const bannerImg = (bannerRow[3] && bannerRow[3].length > 5) ? bannerRow[3] : DEFAULT_IMG;
-                document.getElementById('main-banner').style.backgroundImage = `url('${bannerImg}')`;
-                
-                // Lấy số lượt xem Banner từ Cột G (index 6)
-                // Nếu chưa nhập thì hiện số mặc định đẹp đẹp
-                const viewCount = bannerRow[6] || '12,500'; 
-                document.getElementById('total-views').innerText = viewCount + ' lượt truy cập';
-            }
-
-            // 2. TIN TỨC
-            for (let i = 1; i < data.length; i++) {
-                const row = data[i];
-                if (!row || !row[1]) continue;
-
-                const loai = row[0].trim() || 'TinTuc';
-                if (loai.toUpperCase() === 'BANNER') continue;
-
-                const tieuDe = row[1];
-                const noiDung = row[2];
-                let anh = (row[3] && row[3].length > 5) ? row[3] : DEFAULT_IMG;
-                const link = row[4] || '#';
-                const thoiGian = row[5] || 'Mới đây';
-                // Lấy lượt xem từ Cột G (index 6)
-                const luotXem = row[6] || Math.floor(Math.random() * 500) + 100; // Nếu không nhập thì random giả
-
-                const html = `
-                <div class="col-md-4 col-sm-6">
-                    <div class="info-card">
-                        <div class="card-img-wrapper">
-                            <img src="${anh}" class="card-img-top">
-                            <div class="view-badge"><i class="bi bi-eye"></i> ${luotXem}</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-meta">
-                                <span class="badge-custom bg-${loai}">${loai}</span>
-                                <small style="color: #81d4fa; font-size: 0.75rem">${thoiGian}</small>
+            // --- PHẦN 1: XỬ LÝ BANNER SLIDE ---
+            // Lọc tất cả các dòng là BANNER
+            const banners = homeData.filter(row => row[0] && row[0].toUpperCase().trim() === 'BANNER');
+            
+            if (banners.length > 0) {
+                let slidesHTML = '';
+                banners.forEach((row, index) => {
+                    const activeClass = (index === 0) ? 'active' : ''; // Slide đầu tiên phải có class active
+                    const img = (row[3] && row[3].length > 5) ? row[3] : DEFAULT_IMG;
+                    
+                    slidesHTML += `
+                        <div class="carousel-item ${activeClass}">
+                            <img src="${img}" class="d-block w-100" alt="Banner">
+                            <div class="carousel-caption">
+                                <h2 class="banner-title">${row[1] || ''}</h2>
+                                <p class="d-none d-md-block" style="text-shadow: 2px 2px 0 #000; font-size: 1.2rem">${row[2] || ''}</p>
                             </div>
-                            <h5 class="card-title">${tieuDe}</h5>
-                            <p class="card-text">${noiDung}</p>
-                            ${link !== '#' ? `<a href="${link}" class="btn-view">Xem chi tiết <i class="bi bi-arrow-right"></i></a>` : ''}
                         </div>
-                    </div>
-                </div>`;
-                grid.insertAdjacentHTML('afterbegin', html);
+                    `;
+                });
+                carouselContainer.innerHTML = slidesHTML;
+                
+                // Lấy lượt xem của banner đầu tiên để hiển thị tổng
+                document.getElementById('total-views').innerText = (banners[0][6] || '12,050') + ' lượt truy cập';
+            } else {
+                // Nếu không có banner nào -> Hiển thị ảnh mặc định
+                 carouselContainer.innerHTML = `
+                    <div class="carousel-item active"><img src="${DEFAULT_IMG}" class="d-block w-100"></div>`;
             }
+
+            // --- PHẦN 2: TÌM ĐỊA ĐIỂM HOT NHẤT (TOP 1) ---
+            // Sắp xếp sheet DiaDiem theo cột Lượt Xem (Cột G - index 6) giảm dần
+            if (diaDiemData.length > 1) {
+                // Bỏ dòng tiêu đề, sort
+                const sortedLocations = diaDiemData.slice(1).sort((a, b) => {
+                    const viewA = parseInt((a[6] || '0').replace(/,/g, '')) || 0;
+                    const viewB = parseInt((b[6] || '0').replace(/,/g, '')) || 0;
+                    return viewB - viewA; // Giảm dần
+                });
+
+                // Lấy thằng đầu tiên (Top 1)
+                const top1 = sortedLocations[0];
+                if (top1) {
+                    // Tạo thẻ Top Hot
+                    const htmlTop = createCardHTML(
+                        'TOP CHECK-IN', 
+                        top1[1] + ' <i class="bi bi-fire text-warning"></i>', // Tiêu đề + icon lửa
+                        top1[2], 
+                        top1[3], 
+                        '#', 
+                        'Hot nhất tuần', 
+                        top1[6], 
+                        'bg-TopHot' // Màu nền đặc biệt
+                    );
+                    grid.insertAdjacentHTML('beforeend', htmlTop);
+                }
+            }
+
+            // --- PHẦN 3: HIỂN THỊ CÁC TIN TỨC CÒN LẠI (TRANG CHỦ) ---
+            for (let i = 1; i < homeData.length; i++) {
+                const row = homeData[i];
+                if (!row || !row[1]) continue;
+                const loai = row[0].trim();
+                if (loai.toUpperCase() === 'BANNER') continue; // Bỏ qua banner
+
+                const html = createCardHTML(loai, row[1], row[2], row[3], row[4], row[5], row[6], `bg-${loai}`);
+                grid.insertAdjacentHTML('beforeend', html);
+            }
+        }
+
+        // Hàm tạo thẻ HTML chung
+        function createCardHTML(loai, tieuDe, noiDung, anh, link, thoiGian, luotXem, badgeClass) {
+            const img = (anh && anh.length > 5) ? anh : DEFAULT_IMG;
+            const views = luotXem || Math.floor(Math.random() * 500) + 100;
+            const linkTag = (link && link !== '#') ? `<a href="${link}" class="btn-view">Xem chi tiết <i class="bi bi-arrow-right"></i></a>` : '';
+            
+            return `
+            <div class="col-md-4 col-sm-6">
+                <div class="info-card">
+                    <div class="card-img-wrapper">
+                        <img src="${img}" class="card-img-top">
+                        <div class="view-badge"><i class="bi bi-eye"></i> ${views}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span class="badge-custom ${badgeClass}">${loai}</span>
+                            <small style="color: #81d4fa; font-size: 0.75rem">${thoiGian}</small>
+                        </div>
+                        <h5 class="card-title">${tieuDe}</h5>
+                        <p class="card-text">${noiDung}</p>
+                        ${linkTag}
+                    </div>
+                </div>
+            </div>`;
         }
 
         function parseCSV(str) {
