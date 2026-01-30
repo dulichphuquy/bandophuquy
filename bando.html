@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phú Quý Pro Map - Final Version</title>
+    <title>Phú Quý Pro Map - Deep Linking</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
@@ -28,6 +28,7 @@
         .sidebar {
             width: 380px; background-color: #fff; box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 1000; display: flex; flex-direction: column; overflow: hidden;
+            transition: transform 0.3s ease;
         }
         .sidebar-header { padding: 25px 20px 15px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; flex-shrink: 0; }
         .sidebar-header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
@@ -60,53 +61,34 @@
         .location-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
         .location-item { border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s; display: flex; align-items: center; padding: 12px 15px; }
         .location-item:hover { background-color: #f0f7ff; }
+        .location-item.highlight-active { background-color: #fff3cd; border-left: 5px solid #ffc107; } /* Hiệu ứng highlight */
+        
         .item-thumb { width: 55px; height: 55px; border-radius: 10px; object-fit: cover; margin-right: 15px; background: #eee; }
         .item-info h3 { margin: 0 0 4px; font-size: 15px; color: #333; }
         .item-info span { font-size: 12px; color: #777; }
 
         /* --- GALLERY --- */
         .gallery-container {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            gap: 5px;
-            height: 180px;
-            background: #000;
-            scrollbar-width: none;
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 5px;
+            height: 180px; background: #000; scrollbar-width: none;
         }
         .gallery-container::-webkit-scrollbar { display: none; }
-        
         .gallery-item {
-            flex: 0 0 100%;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            scroll-snap-align: start;
-            cursor: pointer;
-            background: #222;
+            flex: 0 0 100%; width: 100%; height: 100%; object-fit: cover;
+            scroll-snap-align: start; cursor: pointer; background: #222;
         }
 
         /* --- LIGHTBOX --- */
         #lightbox-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
-            cursor: zoom-out;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 10000;
+            justify-content: center; align-items: center; cursor: zoom-out;
         }
         #lightbox-modal img {
-            max-width: 90%;
-            max-height: 90%;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            border: 3px solid white;
-            border-radius: 4px;
+            max-width: 90%; max-height: 90%; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 3px solid white; border-radius: 4px;
         }
-        .close-lightbox {
-            position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer;
-        }
+        .close-lightbox { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
 
         /* --- MAP & MARKERS --- */
         .map-container { flex: 1; position: relative; }
@@ -166,8 +148,12 @@
             border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         
-        .admin-popup { text-align: center; }
-        .admin-popup button { margin-top: 10px; background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column-reverse; }
+            .sidebar { width: 100%; height: 40%; }
+            .map-container { height: 60%; }
+        }
     </style>
 </head>
 <body>
@@ -204,7 +190,7 @@
                 <button class="filter-btn shop" onclick="applyFilter('shop')">Mua bán</button>
             </div>
 
-            <div class="data-counter" id="data-counter">Đang đồng bộ dữ liệu...</div>
+            <div class="data-counter" id="data-counter" style="padding: 10px 15px; font-size: 12px; color: #666; font-style: italic;">Đang đồng bộ dữ liệu...</div>
             <ul class="location-list" id="location-list-container"></ul>
         </aside>
 
@@ -225,7 +211,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <script>
-        // --- CHÚ Ý: ĐÃ ĐIỀN SẴN LINK CỦA BẠN VÀO ĐÂY ---
         const CSV_URLS = {
             sightseeing: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=330502083&single=true&output=csv",
             hotel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ9474mrN1hYwKJv0Zglw2cje-7re85MXpagcr8BP0XKMXQp8gXEqSWDxojc54cSaFJzy5gu1n7fdhX/pub?gid=1951403573&single=true&output=csv",
@@ -247,8 +232,7 @@
 
         window.viewFullImage = (src) => {
             const modal = document.getElementById('lightbox-modal');
-            const img = document.getElementById('lightbox-img');
-            img.src = src;
+            document.getElementById('lightbox-img').src = src;
             modal.style.display = 'flex';
         };
 
@@ -256,7 +240,6 @@
             initMap();
             if (isAdmin) document.getElementById('admin-panel').style.display = 'block';
             try {
-                // Tải song song 5 nguồn dữ liệu
                 await Promise.all([
                     loadData(CSV_URLS.sightseeing, 'sightseeing'),
                     loadData(CSV_URLS.hotel, 'hotel'),
@@ -264,15 +247,51 @@
                     loadData(CSV_URLS.shop, 'shop'),
                     loadData(CSV_URLS.streets, 'street_label')
                 ]);
-            } catch (err) { 
-                console.error(err);
-                // Hiển thị thông báo nếu lỗi (đặc biệt là lỗi CORS khi chạy file offline)
-                alert("LỖI TẢI DỮ LIỆU: " + err + "\n\nNếu bạn đang chạy file trực tiếp trên máy tính, có thể trình duyệt đã chặn kết nối. Hãy thử nhấn F12 xem lỗi chi tiết.");
-            } finally {
+            } catch (err) { console.error(err); } 
+            finally {
                 document.getElementById('loading-overlay').style.display = 'none';
                 updateUI();
+                
+                // --- TÍNH NĂNG MỚI: KIỂM TRA LINK NGOÀI ---
+                checkDeepLink(); 
             }
             setupSearch();
+        }
+
+        // --- HÀM MỚI: XỬ LÝ LIÊN KẾT TỪ TRANG KHÁC ---
+        function checkDeepLink() {
+            const params = new URLSearchParams(window.location.search);
+            const lat = parseFloat(params.get('lat'));
+            const lng = parseFloat(params.get('lng'));
+            
+            if (lat && lng) {
+                // 1. Bay tới địa điểm (Smooth)
+                map.flyTo([lat, lng], 18, { duration: 2.0 });
+
+                // 2. Tìm và mở Popup
+                // Dùng setTimeout để đợi map bay tới nơi rồi mới mở popup
+                setTimeout(() => {
+                    const target = globalLocations.find(item => {
+                        const mLat = parseFloat(item.data.Lat);
+                        const mLng = parseFloat(item.data.Lng);
+                        // So sánh gần đúng vì tọa độ float có thể lệch tí xíu
+                        return Math.abs(mLat - lat) < 0.0001 && Math.abs(mLng - lng) < 0.0001;
+                    });
+
+                    if (target) {
+                        target.marker.openPopup(); // Bật thông tin
+                        
+                        // 3. Highlight bên danh sách
+                        target.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        target.el.classList.add('highlight-active'); // Thêm class vàng
+                        
+                        // Nếu đang ở mobile thì mở rộng phần map
+                        if(window.innerWidth < 768) {
+                            // Logic cho mobile (nếu cần)
+                        }
+                    }
+                }, 2200); // Đợi 2.2 giây (sau khi bay xong)
+            }
         }
 
         function initMap() {
@@ -287,12 +306,6 @@
             if (isAdmin) {
                 map.on('dblclick', (e) => createStreetLabel("Đường Mới", e.latlng.lat, e.latlng.lng, 0));
             }
-
-            map.on('click', (e) => {
-                if (routingControl && routingControl.getPlan().isGeometryValid()) return;
-                const lat = e.latlng.lat.toFixed(6), lng = e.latlng.lng.toFixed(6);
-                L.popup().setLatLng(e.latlng).setContent(`<div style="text-align:center; padding:5px;"><b>Tọa độ:</b><br/><span style="user-select:all; font-family:monospace; background:#eee; padding:2px 4px;">${lat}, ${lng}</span></div>`).openOn(map);
-            });
         }
 
         function loadData(url, type) {
@@ -316,10 +329,7 @@
         function processLocation(row, type) {
             if (!row.Lat || !row.Lng || !row.Ten) return;
             const config = THEME[type];
-            
-            // --- FIX ẢNH: Cắt chuỗi bằng dấu phẩy HOẶC xuống dòng ---
             const rawAnh = row.Anh || row.anh || ""; 
-            // Regex: Cắt khi gặp dấu phẩy (,) hoặc xuống dòng (\n) hoặc chấm phẩy (;)
             const imgs = rawAnh ? rawAnh.split(/[,\n;]+/).map(s => s.trim()).filter(s => s.startsWith('http')) : [];
             const mainImg = imgs[0] || "https://placehold.co/400x200?text=No+Image";
 
@@ -340,7 +350,14 @@
             const el = document.createElement('li');
             el.className = 'location-item';
             el.innerHTML = `<img src="${mainImg}" class="item-thumb"><div class="item-info"><h3>${row.Ten}</h3><span>Phú Quý ${imgs.length > 1 ? `(${imgs.length} ảnh)` : ''}</span></div>`;
-            el.onclick = () => { map.flyTo([row.Lat, row.Lng], 18); marker.openPopup(); };
+            el.onclick = () => { 
+                // Reset active cũ
+                document.querySelectorAll('.location-item').forEach(i => i.classList.remove('highlight-active'));
+                el.classList.add('highlight-active');
+                
+                map.flyTo([row.Lat, row.Lng], 18); 
+                marker.openPopup(); 
+            };
 
             globalLocations.push({ data: row, type, marker, el });
         }
@@ -392,7 +409,7 @@
                 routingControl = L.Routing.control({
                     waypoints: [s, L.latLng(dLat, dLng)],
                     routeWhileDragging: false, showAlternatives: false, fitSelectedRoutes: true,
-                    lineOptions: { styles: [{color: '#FFFF00', opacity: 1, weight: 6}] },
+                    lineOptions: { styles: [{color: '#00d2ff', opacity: 1, weight: 6}] }, // Đổi màu đường đi sang Xanh Neon
                     createMarker: (i, wp) => i === 0 ? L.marker(wp.latLng) : null
                 }).addTo(map);
                 map.closePopup();
